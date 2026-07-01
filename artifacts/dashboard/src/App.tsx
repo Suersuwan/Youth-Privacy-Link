@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
+import { Landing } from "@/pages/landing";
 import { Feed } from "@/pages/feed";
 import { Stats } from "@/pages/stats";
 import { Layout } from "@/components/layout";
@@ -11,13 +12,24 @@ const queryClient = new QueryClient();
 
 function Router() {
   return (
-    <Layout>
-      <Switch>
-        <Route path="/" component={Feed} />
-        <Route path="/stats" component={Stats} />
-        <Route component={NotFound} />
-      </Switch>
-    </Layout>
+    <Switch>
+      <Route path="/" component={Landing} />
+      <Route path="/feed">
+        <Layout>
+          <Feed />
+        </Layout>
+      </Route>
+      <Route path="/stats">
+        <Layout>
+          <Stats />
+        </Layout>
+      </Route>
+      <Route>
+        <Layout>
+          <NotFound />
+        </Layout>
+      </Route>
+    </Switch>
   );
 }
 
