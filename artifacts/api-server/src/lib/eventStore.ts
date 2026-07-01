@@ -19,6 +19,7 @@ export interface EventStats {
   byEventType: Record<string, number>;
   uptimeSeconds: number;
   flaggedEvents: number;
+  alertsFired: number;
 }
 
 const MAX_EVENTS = 200;
@@ -28,6 +29,7 @@ const events: AnonymizedEvent[] = [];
 const seenAnonIds = new Set<string>();
 const byEventType: Record<string, number> = {};
 let flaggedCount = 0;
+let alertsCount = 0;
 const sseClients = new Set<Response>();
 
 export function recordEvent(
@@ -62,6 +64,10 @@ export function recordEvent(
   return event;
 }
 
+export function incrementAlerts(): void {
+  alertsCount++;
+}
+
 export function getRecentEvents(limit = 50): AnonymizedEvent[] {
   return events.slice(0, Math.min(limit, MAX_EVENTS));
 }
@@ -73,6 +79,7 @@ export function getStats(): EventStats {
     byEventType: { ...byEventType },
     uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
     flaggedEvents: flaggedCount,
+    alertsFired: alertsCount,
   };
 }
 

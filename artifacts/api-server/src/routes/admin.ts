@@ -2,6 +2,9 @@ import { Router, type IRouter, Request, Response } from "express";
 import { eq, lt } from "drizzle-orm";
 import { db, anonIdsTable } from "@workspace/db";
 import { adminAuth } from "../middlewares/adminAuth.js";
+import { sendAlert } from "../lib/alertWebhook.js";
+import { incrementAlerts } from "../lib/eventStore.js";
+import { randomUUID } from "crypto";
 
 const router: IRouter = Router();
 
@@ -57,6 +60,44 @@ router.delete("/anon-ids/:realId", async (req: Request, res: Response) => {
     req.log.error({ err }, "Failed to purge anon ID");
     res.status(500).json({ error: "Internal server error" });
   }
+});
+
+/**
+ * POST /api/admin/alert/test
+ * Sends a synthetic test alert to ALERT_WEBHOOK_URL to verify the integration.
+ * Body: { category?: "predator" | "self_harm" }
+ */
+router.post("/alert/test", (req: Request, res: Response) => {
+  const url = process.env["ALERT_WEBHOOK_URL"];
+
+  if (!url) {
+    res.status(400).json({
+      error: "ALERT_WEBHOOK_URL is not configured. Set it as a Replit secret.",
+    });
+    return;
+  }
+
+  const category = (req.body as Record<string, unknown>)?.["category"] === "self_harm"
+    ? "self_harm" as const
+    : "predator" as const;
+
+  sendAlert(
+    {
+      anonId: randomUUID(),
+      category,
+      reason: `[TEST] Synthetic ${category} alert fired from admin endpoint`,
+      eventType: 2,
+      guildId: "test-guild",
+      channelId: "test-channel",
+      timestamp: new Date().toISOString(),
+    },
+    req.log,
+  );
+
+  incrementAlerts();
+
+  req.log.info({ category }, "Test alert dispatched");
+  res.json({ ok: true, message: `Test ${category} alert dispatched to ${url.substring(0, 40)}…` });
 });
 
 export default router;

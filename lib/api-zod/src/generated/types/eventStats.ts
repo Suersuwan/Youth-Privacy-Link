@@ -18,4 +18,6 @@ export interface EventStats {
   uptimeSeconds: number;
   /** Total number of events flagged by content moderation */
   flaggedEvents: number;
+  /** Total number of real-time alerts dispatched to the alert webhook */
+  alertsFired: number;
 }

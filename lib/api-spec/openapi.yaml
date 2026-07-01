@@ -111,7 +111,7 @@ components:
 
     EventStats:
       type: object
-      required: [totalEvents, uniqueAnonIds, byEventType, uptimeSeconds, flaggedEvents]
+      required: [totalEvents, uniqueAnonIds, byEventType, uptimeSeconds, flaggedEvents, alertsFired]
       properties:
         totalEvents:
           type: integer
@@ -130,3 +130,6 @@ components:
         flaggedEvents:
           type: integer
           description: Total number of events flagged by content moderation
+        alertsFired:
+          type: integer
+          description: Total number of real-time alerts dispatched to the alert webhook

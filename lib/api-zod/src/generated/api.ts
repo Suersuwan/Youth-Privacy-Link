@@ -53,7 +53,8 @@ export const GetEventStatsResponse = zod.object({
   "uniqueAnonIds": zod.number().describe('Number of distinct anonymous IDs seen since server start'),
   "byEventType": zod.record(zod.string(), zod.number()).describe('Count of events grouped by Discord event type'),
   "uptimeSeconds": zod.number().describe('Seconds since the server started'),
-  "flaggedEvents": zod.number().describe('Total number of events flagged by content moderation')
+  "flaggedEvents": zod.number().describe('Total number of events flagged by content moderation'),
+  "alertsFired": zod.number().describe('Total number of real-time alerts dispatched to the alert webhook')
 })
 
 

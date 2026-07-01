@@ -1,5 +1,5 @@
 import { useGetEventStats, getGetEventStatsQueryKey } from "@workspace/api-client-react";
-import { BarChart3, Users, Hash, Clock, Server, AlertTriangle } from "lucide-react";
+import { BarChart3, Users, Hash, Clock, Server, AlertTriangle, Bell } from "lucide-react";
 
 export function Stats() {
   const { data: stats } = useGetEventStats({
@@ -57,6 +57,13 @@ export function Stats() {
           value={stats?.flaggedEvents.toLocaleString() ?? "..."}
           accent="destructive"
           sub={stats && stats.totalEvents > 0 ? `${flagRate}% of traffic` : undefined}
+        />
+        <StatCard
+          icon={<Bell className="w-6 h-6" />}
+          label="Alerts Fired"
+          value={stats?.alertsFired.toLocaleString() ?? "..."}
+          accent="destructive"
+          sub="Predator · Self-harm"
         />
       </div>
 
