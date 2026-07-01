@@ -41,7 +41,7 @@ router.post(
   "/discord",
   rateLimit,
   discordWebhookAuth,
-  (req: Request, res: Response) => {
+  async (req: Request, res: Response) => {
     const parsed = DiscordInteractionSchema.safeParse(req.body);
 
     if (!parsed.success) {
@@ -57,11 +57,14 @@ router.post(
       return;
     }
 
-    const anonymized = anonymizePayload(raw as Record<string, unknown>);
-
-    req.log.info({ type: raw.type }, "Discord webhook received");
-
-    res.json({ ok: true, data: anonymized });
+    try {
+      const anonymized = await anonymizePayload(raw as Record<string, unknown>);
+      req.log.info({ type: raw.type }, "Discord webhook received");
+      res.json({ ok: true, data: anonymized });
+    } catch (err) {
+      req.log.error({ err }, "Failed to anonymize payload");
+      res.status(500).json({ error: "Internal server error" });
+    }
   },
 );
 

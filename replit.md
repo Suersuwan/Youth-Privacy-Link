@@ -47,7 +47,7 @@ _Populate as you build — explicit user instructions worth remembering across s
 ## Gotchas
 
 - `DISCORD_PUBLIC_KEY` must be set in production or all webhook requests will be accepted without signature verification.
-- The anonymous ID store is in-memory — a server restart clears all mappings (IDs regenerate on next event). For persistent cross-restart anonymization, back the store with the database.
+- Anonymous ID mappings are stored in Postgres (`anon_ids` table) with a 24-hour TTL. The in-memory map acts as a fast read-through cache. Server restarts are safe — mappings survive in the DB.
 - Do not call both the raw-body middleware and `express.json` with `verify` — the stream can only be read once. Use only the `verify` callback on `express.json`.
 
 ## Pointers
