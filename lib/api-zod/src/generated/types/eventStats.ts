@@ -16,4 +16,6 @@ export interface EventStats {
   byEventType: EventStatsByEventType;
   /** Seconds since the server started */
   uptimeSeconds: number;
+  /** Total number of events flagged by content moderation */
+  flaggedEvents: number;
 }

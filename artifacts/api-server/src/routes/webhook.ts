@@ -4,6 +4,7 @@ import { anonymizePayload, getAnonId } from "../lib/anonymize.js";
 import { rateLimit } from "../middlewares/rateLimit.js";
 import { discordWebhookAuth } from "../middlewares/discordWebhookAuth.js";
 import { recordEvent } from "../lib/eventStore.js";
+import { scanObject } from "../lib/contentGuard.js";
 
 const router: IRouter = Router();
 
@@ -61,20 +62,31 @@ router.post(
     try {
       const anonymized = await anonymizePayload(raw as Record<string, unknown>);
 
-      const realUserId =
-        raw.user?.id ?? raw.member?.user?.id;
+      const realUserId = raw.user?.id ?? raw.member?.user?.id;
       const anonId = realUserId
         ? await getAnonId(realUserId)
         : (anonymized["id"] as string | undefined) ?? "unknown";
+
+      const moderation = scanObject(raw.data);
+
+      if (moderation.flagged) {
+        req.log.warn(
+          { category: moderation.category, reason: moderation.reason },
+          "Content moderation guard flagged event",
+        );
+      }
 
       recordEvent(
         anonId,
         raw.type,
         raw.guild_id ?? null,
         raw.channel_id ?? null,
+        moderation.flagged,
+        moderation.reason,
+        moderation.category,
       );
 
-      req.log.info({ type: raw.type }, "Discord webhook received");
+      req.log.info({ type: raw.type, flagged: moderation.flagged }, "Discord webhook received");
       res.json({ ok: true, data: anonymized });
     } catch (err) {
       req.log.error({ err }, "Failed to anonymize payload");

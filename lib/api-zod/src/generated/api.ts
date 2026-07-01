@@ -36,7 +36,10 @@ export const ListEventsResponseItem = zod.object({
   "eventType": zod.number().describe('Discord interaction type number'),
   "timestamp": zod.coerce.date().describe('ISO timestamp of when the event was received'),
   "guildId": zod.string().nullable().describe('Guild ID (passed through as-is, not PII)'),
-  "channelId": zod.string().nullable().describe('Channel ID (passed through as-is, not PII)')
+  "channelId": zod.string().nullable().describe('Channel ID (passed through as-is, not PII)'),
+  "flagged": zod.boolean().describe('Whether the content moderation guard flagged this event'),
+  "flagReason": zod.string().nullable().describe('Human-readable reason the event was flagged, or null if clean'),
+  "flagCategory": zod.string().nullable().describe('Moderation category (toxicity, predator, scam, malicious_link, self_harm) or null')
 })
 export const ListEventsResponse = zod.array(ListEventsResponseItem)
 
@@ -49,7 +52,8 @@ export const GetEventStatsResponse = zod.object({
   "totalEvents": zod.number().describe('Total events received since server start'),
   "uniqueAnonIds": zod.number().describe('Number of distinct anonymous IDs seen since server start'),
   "byEventType": zod.record(zod.string(), zod.number()).describe('Count of events grouped by Discord event type'),
-  "uptimeSeconds": zod.number().describe('Seconds since the server started')
+  "uptimeSeconds": zod.number().describe('Seconds since the server started'),
+  "flaggedEvents": zod.number().describe('Total number of events flagged by content moderation')
 })
 
 

@@ -253,8 +253,8 @@ export function Landing() {
       <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 lg:px-24 py-5 border-b border-border/50 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           <ShieldCheck className="w-6 h-6 text-primary drop-shadow-[0_0_8px_var(--color-primary)]" />
-          <span className="font-bold text-lg tracking-tight uppercase text-foreground">Overwatch</span>
-          <span className="hidden sm:inline text-[10px] text-primary/50 uppercase tracking-widest ml-2 font-semibold">// Youth Hub</span>
+          <span className="font-bold text-lg tracking-tight uppercase text-foreground">FreeZone</span>
+          <span className="hidden sm:inline text-[10px] text-primary/50 uppercase tracking-widest ml-2 font-semibold">// Safe Space</span>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/feed" className="text-muted-foreground hover:text-foreground text-xs uppercase tracking-widest transition-colors hidden sm:block">
@@ -277,25 +277,31 @@ export function Landing() {
         <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/30 px-4 py-1.5 rounded-full mb-8 shadow-[0_0_12px_rgba(0,255,209,0.15)]">
           <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
           <span className="text-primary text-[11px] font-bold uppercase tracking-[0.3em]">
-            Secure · Private · Real-Time
+            Free-To-Express · Safe-Zone · Real-Time
           </span>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight mb-6 max-w-4xl">
-          <span className="text-foreground">The Ultimate</span>
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight mb-6 max-w-5xl">
+          <span className="text-foreground">Express Yourself</span>
           <br />
           <span
             className="text-transparent bg-clip-text"
             style={{ backgroundImage: "linear-gradient(135deg, #00ffd1 0%, #00b8d4 40%, #7c3aed 100%)" }}
           >
-            Youth Social Hub
+            Freely. Connect Every App.
           </span>
+          <br />
+          <span className="text-foreground">For Free.</span>
         </h1>
 
-        <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed mb-10 font-sans">
+        <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed mb-4 font-sans">
           Connecting{" "}
-          <span className="text-foreground font-semibold">TikTok, Instagram, Discord,</span>{" "}
-          and all your favorite apps in one secure, anonymized space — where you stay in control.
+          <span className="text-foreground font-semibold">Instagram, TikTok, Discord, X, YouTube</span>{" "}
+          and every social platform in one secure, anonymized space.
+        </p>
+        <p className="text-base sm:text-lg font-bold mb-10 font-sans tracking-wide">
+          <span className="text-primary">Zero Identity Tracking.</span>{" "}
+          <span className="text-foreground">Maximum Youth Safety.</span>
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -322,7 +328,7 @@ export function Landing() {
             Integrated Platforms
           </p>
           <h2 className="text-center text-2xl md:text-3xl font-bold uppercase mb-12 text-foreground">
-            All Your Apps. One Hub.
+            All Your Apps. One Safe Hub.
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -402,7 +408,7 @@ export function Landing() {
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-primary/50" />
           <span className="text-[11px] text-muted-foreground/50 uppercase tracking-widest">
-            Overwatch // Secure Youth Hub
+            FreeZone // Secure Youth Hub
           </span>
         </div>
         <div className="flex items-center gap-6 text-[11px] text-muted-foreground/40 uppercase tracking-widest">

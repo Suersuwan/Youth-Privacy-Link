@@ -78,7 +78,7 @@ components:
 
     AnonymizedEvent:
       type: object
-      required: [id, anonId, eventType, timestamp, guildId, channelId]
+      required: [id, anonId, eventType, timestamp, guildId, channelId, flagged, flagReason, flagCategory]
       properties:
         id:
           type: string
@@ -99,10 +99,19 @@ components:
         channelId:
           type: ["string", "null"]
           description: Channel ID (passed through as-is, not PII)
+        flagged:
+          type: boolean
+          description: Whether the content moderation guard flagged this event
+        flagReason:
+          type: ["string", "null"]
+          description: Human-readable reason the event was flagged, or null if clean
+        flagCategory:
+          type: ["string", "null"]
+          description: Moderation category (toxicity, predator, scam, malicious_link, self_harm) or null
 
     EventStats:
       type: object
-      required: [totalEvents, uniqueAnonIds, byEventType, uptimeSeconds]
+      required: [totalEvents, uniqueAnonIds, byEventType, uptimeSeconds, flaggedEvents]
       properties:
         totalEvents:
           type: integer
@@ -118,3 +127,6 @@ components:
         uptimeSeconds:
           type: integer
           description: Seconds since the server started
+        flaggedEvents:
+          type: integer
+          description: Total number of events flagged by content moderation

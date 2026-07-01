@@ -30,7 +30,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="p-6 border-b border-border bg-background">
           <div className="flex items-center gap-3">
             <ShieldCheck className="w-6 h-6 text-primary drop-shadow-[0_0_8px_var(--color-primary)]" />
-            <span className="font-bold text-lg tracking-tight uppercase text-foreground">Overwatch</span>
+            <span className="font-bold text-lg tracking-tight uppercase text-foreground">FreeZone</span>
           </div>
           <div className="text-[10px] text-primary/70 mt-2 uppercase tracking-widest font-semibold">
             Secure Comms Monitor

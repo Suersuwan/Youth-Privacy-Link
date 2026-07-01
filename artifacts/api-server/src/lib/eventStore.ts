@@ -8,6 +8,9 @@ export interface AnonymizedEvent {
   timestamp: string;
   guildId: string | null;
   channelId: string | null;
+  flagged: boolean;
+  flagReason: string | null;
+  flagCategory: string | null;
 }
 
 export interface EventStats {
@@ -15,6 +18,7 @@ export interface EventStats {
   uniqueAnonIds: number;
   byEventType: Record<string, number>;
   uptimeSeconds: number;
+  flaggedEvents: number;
 }
 
 const MAX_EVENTS = 200;
@@ -23,6 +27,7 @@ const startedAt = Date.now();
 const events: AnonymizedEvent[] = [];
 const seenAnonIds = new Set<string>();
 const byEventType: Record<string, number> = {};
+let flaggedCount = 0;
 const sseClients = new Set<Response>();
 
 export function recordEvent(
@@ -30,6 +35,9 @@ export function recordEvent(
   eventType: number,
   guildId: string | null,
   channelId: string | null,
+  flagged = false,
+  flagReason: string | null = null,
+  flagCategory: string | null = null,
 ): AnonymizedEvent {
   const event: AnonymizedEvent = {
     id: randomUUID(),
@@ -38,6 +46,9 @@ export function recordEvent(
     timestamp: new Date().toISOString(),
     guildId,
     channelId,
+    flagged,
+    flagReason,
+    flagCategory,
   };
 
   events.unshift(event);
@@ -45,6 +56,7 @@ export function recordEvent(
 
   seenAnonIds.add(anonId);
   byEventType[String(eventType)] = (byEventType[String(eventType)] ?? 0) + 1;
+  if (flagged) flaggedCount++;
 
   broadcast(event);
   return event;
@@ -60,6 +72,7 @@ export function getStats(): EventStats {
     uniqueAnonIds: seenAnonIds.size,
     byEventType: { ...byEventType },
     uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
+    flaggedEvents: flaggedCount,
   };
 }
 

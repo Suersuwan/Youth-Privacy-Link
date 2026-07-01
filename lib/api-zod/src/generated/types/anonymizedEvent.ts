@@ -25,4 +25,16 @@ export interface AnonymizedEvent {
      * @nullable
      */
   channelId: string | null;
+  /** Whether the content moderation guard flagged this event */
+  flagged: boolean;
+  /**
+     * Human-readable reason the event was flagged, or null if clean
+     * @nullable
+     */
+  flagReason: string | null;
+  /**
+     * Moderation category (toxicity, predator, scam, malicious_link, self_harm) or null
+     * @nullable
+     */
+  flagCategory: string | null;
 }
