@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: events
+    description: Anonymized activity event log
 paths:
   /healthz:
     get:
@@ -24,6 +26,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /events:
+    get:
+      operationId: listEvents
+      tags: [events]
+      summary: List recent anonymized events
+      description: Returns the most recent anonymized activity events (newest first, max 200)
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+      responses:
+        "200":
+          description: List of recent anonymized events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnonymizedEvent"
+
+  /events/stats:
+    get:
+      operationId: getEventStats
+      tags: [events]
+      summary: Event statistics
+      description: Returns aggregate stats about events seen since server start
+      responses:
+        "200":
+          description: Aggregate event statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventStats"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +76,45 @@ components:
       required:
         - status
 
+    AnonymizedEvent:
+      type: object
+      required: [id, anonId, eventType, timestamp, guildId, channelId]
+      properties:
+        id:
+          type: string
+          description: Unique event UUID
+        anonId:
+          type: string
+          description: Stable anonymous user UUID (24h TTL)
+        eventType:
+          type: integer
+          description: Discord interaction type number
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO timestamp of when the event was received
+        guildId:
+          type: ["string", "null"]
+          description: Guild ID (passed through as-is, not PII)
+        channelId:
+          type: ["string", "null"]
+          description: Channel ID (passed through as-is, not PII)
+
+    EventStats:
+      type: object
+      required: [totalEvents, uniqueAnonIds, byEventType, uptimeSeconds]
+      properties:
+        totalEvents:
+          type: integer
+          description: Total events received since server start
+        uniqueAnonIds:
+          type: integer
+          description: Number of distinct anonymous IDs seen since server start
+        byEventType:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Count of events grouped by Discord event type
+        uptimeSeconds:
+          type: integer
+          description: Seconds since the server started

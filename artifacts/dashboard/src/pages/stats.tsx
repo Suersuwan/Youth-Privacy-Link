@@ -1,0 +1,93 @@
+import { useGetEventStats, getGetEventStatsQueryKey } from "@workspace/api-client-react";
+import { BarChart3, Users, Hash, Clock, Server } from "lucide-react";
+
+export function Stats() {
+  const { data: stats } = useGetEventStats({
+    query: {
+      queryKey: getGetEventStatsQueryKey(),
+      refetchInterval: 10000,
+    }
+  });
+
+  const formatUptime = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h}h ${m}m ${s}s`;
+  };
+
+  return (
+    <div className="flex flex-col h-full p-6 overflow-auto font-mono">
+      <header className="mb-8 pb-4 border-b border-border">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground uppercase flex items-center gap-3">
+          <Server className="w-6 h-6 text-primary" />
+          System Telemetry
+        </h1>
+        <p className="text-muted-foreground text-xs mt-2 uppercase tracking-widest">Aggregated statistics & anomaly counts</p>
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard 
+          icon={<Hash className="w-6 h-6" />} 
+          label="Total Intercepts" 
+          value={stats?.totalEvents.toLocaleString() || "..."} 
+        />
+        <StatCard 
+          icon={<Users className="w-6 h-6" />} 
+          label="Unique Subjects" 
+          value={stats?.uniqueAnonIds.toLocaleString() || "..."} 
+        />
+        <StatCard 
+          icon={<BarChart3 className="w-6 h-6" />} 
+          label="Event Types" 
+          value={Object.keys(stats?.byEventType || {}).length.toString() || "..."} 
+        />
+        <StatCard 
+          icon={<Clock className="w-6 h-6" />} 
+          label="Uptime" 
+          value={stats ? formatUptime(stats.uptimeSeconds) : "..."} 
+        />
+      </div>
+
+      <div className="bg-card border border-border p-6 rounded shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+        <h2 className="text-sm font-bold uppercase tracking-widest mb-6 pb-3 border-b border-border/50 text-muted-foreground flex items-center gap-2">
+          <div className="w-1.5 h-1.5 bg-primary/50" />
+          Event Distribution Vector
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {stats?.byEventType && Object.entries(stats.byEventType).map(([type, count]) => (
+            <div key={type} className="bg-secondary/40 border border-border p-4 flex flex-col gap-3 relative overflow-hidden group hover:border-primary/30 transition-colors">
+              <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="text-[10px] text-muted-foreground/70 uppercase tracking-widest font-bold">Type_{type}</div>
+              <div className="text-2xl font-bold text-primary tracking-tight">{count.toLocaleString()}</div>
+            </div>
+          ))}
+          
+          {(!stats?.byEventType || Object.keys(stats.byEventType).length === 0) && (
+            <div className="col-span-full py-12 text-center text-muted-foreground uppercase tracking-widest text-xs">
+              No event vectors detected.
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) {
+  return (
+    <div className="bg-card border border-border p-6 relative overflow-hidden group shadow-lg">
+      <div className="absolute top-0 right-0 p-6 text-primary/5 transform translate-x-2 -translate-y-2 group-hover:scale-110 group-hover:text-primary/10 transition-all duration-500">
+        {icon}
+      </div>
+      <div className="relative z-10 flex items-center gap-3 text-muted-foreground mb-4">
+        <div className="text-primary drop-shadow-[0_0_8px_rgba(0,255,209,0.5)]">{icon}</div>
+        <h3 className="text-[10px] font-bold uppercase tracking-widest">{label}</h3>
+      </div>
+      <div className="text-4xl font-bold tracking-tight text-foreground relative z-10">
+        {value}
+      </div>
+      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary/50 to-transparent" />
+    </div>
+  );
+}

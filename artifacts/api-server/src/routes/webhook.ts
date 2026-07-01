@@ -1,8 +1,9 @@
 import { Router, type IRouter, Request, Response } from "express";
 import { z } from "zod";
-import { anonymizePayload } from "../lib/anonymize.js";
+import { anonymizePayload, getAnonId } from "../lib/anonymize.js";
 import { rateLimit } from "../middlewares/rateLimit.js";
 import { discordWebhookAuth } from "../middlewares/discordWebhookAuth.js";
+import { recordEvent } from "../lib/eventStore.js";
 
 const router: IRouter = Router();
 
@@ -59,6 +60,20 @@ router.post(
 
     try {
       const anonymized = await anonymizePayload(raw as Record<string, unknown>);
+
+      const realUserId =
+        raw.user?.id ?? raw.member?.user?.id;
+      const anonId = realUserId
+        ? await getAnonId(realUserId)
+        : (anonymized["id"] as string | undefined) ?? "unknown";
+
+      recordEvent(
+        anonId,
+        raw.type,
+        raw.guild_id ?? null,
+        raw.channel_id ?? null,
+      );
+
       req.log.info({ type: raw.type }, "Discord webhook received");
       res.json({ ok: true, data: anonymized });
     } catch (err) {

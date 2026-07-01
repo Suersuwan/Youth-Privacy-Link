@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
-}
+/**
+ * Count of events grouped by Discord event type
+ */
+export type EventStatsByEventType = {[key: string]: number};
