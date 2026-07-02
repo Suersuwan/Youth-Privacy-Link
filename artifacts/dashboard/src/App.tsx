@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import { Landing } from "@/pages/landing";
 import { Feed } from "@/pages/feed";
 import { Stats } from "@/pages/stats";
+import { ModLog } from "@/pages/modlog";
 import { Layout } from "@/components/layout";
 import { WelcomeModal } from "@/components/WelcomeModal";
 
@@ -23,6 +24,11 @@ function Router() {
       <Route path="/stats">
         <Layout>
           <Stats />
+        </Layout>
+      </Route>
+      <Route path="/modlog">
+        <Layout>
+          <ModLog />
         </Layout>
       </Route>
       <Route>

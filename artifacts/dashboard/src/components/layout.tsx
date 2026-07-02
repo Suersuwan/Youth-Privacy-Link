@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Activity, BarChart3, ShieldCheck, ShieldAlert, Home } from "lucide-react";
+import { Activity, BarChart3, ShieldCheck, ShieldAlert, Home, FileText } from "lucide-react";
 import { useHealthCheck, getHealthCheckQueryKey } from "@workspace/api-client-react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -41,6 +41,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           {navItem("/", Home, "Home")}
           {navItem("/feed", Activity, "Live Feed")}
           {navItem("/stats", BarChart3, "Telemetry")}
+          {navItem("/modlog", FileText, "Mod Log")}
         </nav>
 
         <div className="p-4 border-t border-border text-xs flex items-center gap-2 bg-background/50">
