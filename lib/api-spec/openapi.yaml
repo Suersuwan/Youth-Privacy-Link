@@ -66,6 +66,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/EventStats"
 
+  /crisis/support:
+    post:
+      operationId: sendCrisisSupport
+      tags: [events]
+      summary: Send anonymous peer support prompt
+      description: >
+        Records a peer-support action for an anonymous user who triggered a self-harm
+        alert, and posts a safeguarding notice to the configured alert webhook.
+        No admin key required — the anonId carries no PII.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CrisisSupportRequest"
+      responses:
+        "200":
+          description: Support action recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CrisisSupportResponse"
+        "400":
+          description: Bad request
+
 components:
   schemas:
     HealthStatus:
@@ -133,3 +158,27 @@ components:
         alertsFired:
           type: integer
           description: Total number of real-time alerts dispatched to the alert webhook
+        supportMessagesSent:
+          type: integer
+          description: Total number of anonymous peer-support prompts sent
+
+    CrisisSupportRequest:
+      type: object
+      required: [anonId]
+      properties:
+        anonId:
+          type: string
+          description: Anonymous user ID (no PII) who triggered the crisis signal
+        channelId:
+          type: ["string", "null"]
+          description: Channel where the flagged message appeared (optional)
+
+    CrisisSupportResponse:
+      type: object
+      required: [ok, notified]
+      properties:
+        ok:
+          type: boolean
+        notified:
+          type: boolean
+          description: True if a notice was dispatched to the alert webhook

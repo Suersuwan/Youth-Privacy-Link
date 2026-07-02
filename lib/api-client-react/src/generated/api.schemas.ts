@@ -60,6 +60,24 @@ export interface EventStats {
   flaggedEvents: number;
   /** Total number of real-time alerts dispatched to the alert webhook */
   alertsFired: number;
+  /** Total number of anonymous peer-support prompts sent */
+  supportMessagesSent?: number;
+}
+
+export interface CrisisSupportRequest {
+  /** Anonymous user ID (no PII) who triggered the crisis signal */
+  anonId: string;
+  /**
+     * Channel where the flagged message appeared (optional)
+     * @nullable
+     */
+  channelId?: string | null;
+}
+
+export interface CrisisSupportResponse {
+  ok: boolean;
+  /** True if a notice was dispatched to the alert webhook */
+  notified: boolean;
 }
 
 export type ListEventsParams = {

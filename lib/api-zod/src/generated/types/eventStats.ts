@@ -20,4 +20,6 @@ export interface EventStats {
   flaggedEvents: number;
   /** Total number of real-time alerts dispatched to the alert webhook */
   alertsFired: number;
+  /** Total number of anonymous peer-support prompts sent */
+  supportMessagesSent?: number;
 }

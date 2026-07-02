@@ -7,6 +7,8 @@
  */
 
 export * from './anonymizedEvent';
+export * from './crisisSupportRequest';
+export * from './crisisSupportResponse';
 export * from './eventStats';
 export * from './eventStatsByEventType';
 export * from './healthStatus';

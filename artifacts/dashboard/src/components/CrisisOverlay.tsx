@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { X, ShieldAlert, Phone, MessageSquare, Globe } from "lucide-react";
+import { X, ShieldAlert, Phone, MessageSquare, Globe, Heart, CheckCircle2, Loader2 } from "lucide-react";
+import { useSendCrisisSupport } from "@workspace/api-client-react";
 import type { AnonymizedEvent } from "@workspace/api-client-react";
 
 interface Props {
@@ -33,10 +34,18 @@ const RESOURCES = [
 
 export function CrisisOverlay({ event, onDismiss }: Props) {
   const [visible, setVisible] = useState(false);
+  const [supportSent, setSupportSent] = useState(false);
+
+  const { mutate: sendSupport, isPending } = useSendCrisisSupport({
+    mutation: {
+      onSuccess: () => setSupportSent(true),
+    },
+  });
 
   useEffect(() => {
     if (!event) {
       setVisible(false);
+      setSupportSent(false);
       return;
     }
     // slight delay so CSS transition plays on mount
@@ -44,9 +53,18 @@ export function CrisisOverlay({ event, onDismiss }: Props) {
     return () => clearTimeout(t);
   }, [event]);
 
+  function handleSendSupport() {
+    if (!event || supportSent || isPending) return;
+    sendSupport({
+      data: {
+        anonId: event.anonId,
+        channelId: event.channelId ?? null,
+      },
+    });
+  }
+
   function handleDismiss() {
     setVisible(false);
-    // wait for slide-out before clearing
     setTimeout(onDismiss, 350);
   }
 
@@ -65,7 +83,7 @@ export function CrisisOverlay({ event, onDismiss }: Props) {
           : "translate-y-8 opacity-0 pointer-events-none"
       }`}
     >
-      {/* Outer glow ring */}
+      {/* outer glow ring */}
       <div className="absolute -inset-px rounded-xl bg-gradient-to-br from-orange-500/60 via-red-500/30 to-transparent blur-[2px] pointer-events-none" />
 
       <div className="relative bg-card border border-orange-500/40 rounded-xl shadow-[0_0_40px_rgba(249,115,22,0.25)] overflow-hidden">
@@ -134,15 +152,53 @@ export function CrisisOverlay({ event, onDismiss }: Props) {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="px-4 pt-3 pb-4">
+        {/* Actions */}
+        <div className="px-4 pt-3 pb-4 space-y-2">
+          {/* Peer support button */}
+          <button
+            onClick={handleSendSupport}
+            disabled={supportSent || isPending}
+            className={`w-full flex items-center justify-center gap-2 py-2.5 rounded border text-[11px] font-bold uppercase tracking-widest font-mono transition-all duration-300 ${
+              supportSent
+                ? "border-green-500/30 bg-green-500/10 text-green-400 cursor-default"
+                : isPending
+                  ? "border-green-500/20 bg-green-500/5 text-green-500/60 cursor-not-allowed"
+                  : "border-green-500/30 bg-green-500/10 text-green-400 hover:bg-green-500/20 hover:shadow-[0_0_12px_rgba(34,197,94,0.2)]"
+            }`}
+          >
+            {supportSent ? (
+              <>
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                Support Message Sent 💚
+              </>
+            ) : isPending ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                Sending…
+              </>
+            ) : (
+              <>
+                <Heart className="w-3.5 h-3.5" />
+                Send Peer Support Prompt 💚
+              </>
+            )}
+          </button>
+
+          {supportSent && (
+            <p className="text-center text-[10px] text-green-500/60 font-mono">
+              Safeguarding notice dispatched to alert channel
+            </p>
+          )}
+
+          {/* Dismiss */}
           <button
             onClick={handleDismiss}
             className="w-full py-2.5 rounded border border-orange-500/30 bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 text-[11px] font-bold uppercase tracking-widest font-mono transition-all hover:shadow-[0_0_12px_rgba(249,115,22,0.2)]"
           >
             Mark Reviewed & Dismiss
           </button>
-          <p className="text-center text-[9px] text-muted-foreground/40 uppercase tracking-widest font-mono mt-2">
+
+          <p className="text-center text-[9px] text-muted-foreground/40 uppercase tracking-widest font-mono">
             Alert logged · Anon ID only · No PII stored
           </p>
         </div>

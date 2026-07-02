@@ -6,24 +6,30 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
   AnonymizedEvent,
+  CrisisSupportRequest,
+  CrisisSupportResponse,
   EventStats,
   HealthStatus,
   ListEventsParams
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
-import type { ErrorType } from '../custom-fetch';
+import type { ErrorType , BodyType } from '../custom-fetch';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -289,4 +295,75 @@ export function useGetEventStats<TData = Awaited<ReturnType<typeof getEventStats
 
 
 
+
+export const getSendCrisisSupportUrl = () => {
+
+
+
+
+  return `/api/crisis/support`
+}
+
+/**
+ * Records a peer-support action for an anonymous user who triggered a self-harm alert, and posts a safeguarding notice to the configured alert webhook. No admin key required — the anonId carries no PII.
+ * @summary Send anonymous peer support prompt
+ */
+export const sendCrisisSupport = async (crisisSupportRequest: CrisisSupportRequest, options?: RequestInit): Promise<CrisisSupportResponse> => {
+
+  return customFetch<CrisisSupportResponse>(getSendCrisisSupportUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(crisisSupportRequest)
+  }
+);}
+
+
+
+
+export const getSendCrisisSupportMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendCrisisSupport>>, TError,{data: BodyType<CrisisSupportRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof sendCrisisSupport>>, TError,{data: BodyType<CrisisSupportRequest>}, TContext> => {
+
+const mutationKey = ['sendCrisisSupport'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sendCrisisSupport>>, {data: BodyType<CrisisSupportRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  sendCrisisSupport(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SendCrisisSupportMutationResult = NonNullable<Awaited<ReturnType<typeof sendCrisisSupport>>>
+    export type SendCrisisSupportMutationBody = BodyType<CrisisSupportRequest>
+    export type SendCrisisSupportMutationError = ErrorType<void>
+
+    /**
+ * @summary Send anonymous peer support prompt
+ */
+export const useSendCrisisSupport = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendCrisisSupport>>, TError,{data: BodyType<CrisisSupportRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof sendCrisisSupport>>,
+        TError,
+        {data: BodyType<CrisisSupportRequest>},
+        TContext
+      > => {
+      return useMutation(getSendCrisisSupportMutationOptions(options));
+    }
 

@@ -54,7 +54,23 @@ export const GetEventStatsResponse = zod.object({
   "byEventType": zod.record(zod.string(), zod.number()).describe('Count of events grouped by Discord event type'),
   "uptimeSeconds": zod.number().describe('Seconds since the server started'),
   "flaggedEvents": zod.number().describe('Total number of events flagged by content moderation'),
-  "alertsFired": zod.number().describe('Total number of real-time alerts dispatched to the alert webhook')
+  "alertsFired": zod.number().describe('Total number of real-time alerts dispatched to the alert webhook'),
+  "supportMessagesSent": zod.number().optional().describe('Total number of anonymous peer-support prompts sent')
+})
+
+
+/**
+ * Records a peer-support action for an anonymous user who triggered a self-harm alert, and posts a safeguarding notice to the configured alert webhook. No admin key required — the anonId carries no PII.
+ * @summary Send anonymous peer support prompt
+ */
+export const SendCrisisSupportBody = zod.object({
+  "anonId": zod.string().describe('Anonymous user ID (no PII) who triggered the crisis signal'),
+  "channelId": zod.string().nullish().describe('Channel where the flagged message appeared (optional)')
+})
+
+export const SendCrisisSupportResponse = zod.object({
+  "ok": zod.boolean(),
+  "notified": zod.boolean().describe('True if a notice was dispatched to the alert webhook')
 })
 
 

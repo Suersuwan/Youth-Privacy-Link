@@ -20,6 +20,7 @@ export interface EventStats {
   uptimeSeconds: number;
   flaggedEvents: number;
   alertsFired: number;
+  supportMessagesSent: number;
 }
 
 const MAX_EVENTS = 200;
@@ -30,6 +31,7 @@ const seenAnonIds = new Set<string>();
 const byEventType: Record<string, number> = {};
 let flaggedCount = 0;
 let alertsCount = 0;
+let supportCount = 0;
 const sseClients = new Set<Response>();
 
 export function recordEvent(
@@ -68,6 +70,10 @@ export function incrementAlerts(): void {
   alertsCount++;
 }
 
+export function incrementSupport(): void {
+  supportCount++;
+}
+
 export function getRecentEvents(limit = 50): AnonymizedEvent[] {
   return events.slice(0, Math.min(limit, MAX_EVENTS));
 }
@@ -80,6 +86,7 @@ export function getStats(): EventStats {
     uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
     flaggedEvents: flaggedCount,
     alertsFired: alertsCount,
+    supportMessagesSent: supportCount,
   };
 }
 

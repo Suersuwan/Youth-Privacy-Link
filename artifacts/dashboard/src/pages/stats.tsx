@@ -1,5 +1,5 @@
 import { useGetEventStats, getGetEventStatsQueryKey } from "@workspace/api-client-react";
-import { BarChart3, Users, Hash, Clock, Server, AlertTriangle, Bell } from "lucide-react";
+import { BarChart3, Users, Hash, Clock, Server, AlertTriangle, Bell, Heart } from "lucide-react";
 
 export function Stats() {
   const { data: stats } = useGetEventStats({
@@ -65,6 +65,13 @@ export function Stats() {
           accent="destructive"
           sub="Predator · Self-harm"
         />
+        <StatCard
+          icon={<Heart className="w-6 h-6" />}
+          label="Support Sent"
+          value={stats?.supportMessagesSent?.toLocaleString() ?? "0"}
+          accent="support"
+          sub="Peer support prompts"
+        />
       </div>
 
       {/* Content Moderation Guard status bar */}
@@ -118,15 +125,20 @@ function StatCard({
   icon: React.ReactNode;
   label: string;
   value: string;
-  accent?: "primary" | "destructive";
+  accent?: "primary" | "destructive" | "support";
   sub?: string;
 }) {
-  const color = accent === "destructive" ? "text-destructive" : "text-primary";
-  const glow = accent === "destructive"
-    ? "drop-shadow-[0_0_8px_rgba(220,38,38,0.5)]"
+  const color =
+    accent === "destructive" ? "text-destructive"
+    : accent === "support" ? "text-green-400"
+    : "text-primary";
+  const glow =
+    accent === "destructive" ? "drop-shadow-[0_0_8px_rgba(220,38,38,0.5)]"
+    : accent === "support" ? "drop-shadow-[0_0_8px_rgba(34,197,94,0.5)]"
     : "drop-shadow-[0_0_8px_rgba(0,255,209,0.5)]";
-  const bar = accent === "destructive"
-    ? "from-destructive/50"
+  const bar =
+    accent === "destructive" ? "from-destructive/50"
+    : accent === "support" ? "from-green-500/50"
     : "from-primary/50";
 
   return (
