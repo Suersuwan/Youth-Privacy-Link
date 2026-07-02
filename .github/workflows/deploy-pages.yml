@@ -1,68 +1,19 @@
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: [ "main" ]
-  workflow_dispatch:
-
-# ✅ สิทธิ์ครบถ้วน
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# ✅ ตัวแปรทั้งชุด ตั้งค่าไว้ชัดเจน
-env:
-  PORT: 3000
-  VITE_PORT: 3000
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # ✅ ย้ำอีกครั้งให้งานนี้เห็นค่า PORT แน่นอน
     env:
       PORT: 3000
     steps:
-      - name: ดึงโค้ด
-        uses: actions/checkout@v4
+      # --- ส่วนอื่น (checkout, ติดตั้ง node/pnpm) ปล่อยเหมือนเดิม ---
 
-      - name: ติดตั้ง Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      # ✅ ใส่/แก้ตรงนี้ แทนคำสั่ง build เดิมทั้งหมด
+      - name: สร้างแค่ mockup-sandbox เท่านั้น
+        run: |
+          cd artifacts/mockup-sandbox
+          PORT=3000 pnpm build
 
-      - name: ติดตั้ง pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
-
-      - name: ติดตั้งแพ็กเกจ
-        run: pnpm install
-
-      - name: สร้างโปรเจกต์ (แก้ปัญหา PORT โดยตรง)
-        run: PORT=3000 pnpm build
-
-      - name: ตั้งค่า GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: อัปโหลดไฟล์
+      - name: อัปโหลดไฟล์ผลลัพธ์
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist' # ถ้าไฟล์ผลลัพธ์อยู่โฟลเดอร์อื่น แก้ตรงนี้
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: เผยแพร่
-        id: deployment
-        uses: actions/deploy-pages@v4
+          path: './artifacts/mockup-sandbox/dist'
