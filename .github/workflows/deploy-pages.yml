@@ -1,19 +1,74 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      PORT: 3000
+    timeout-minutes: 15
     steps:
-      # --- ส่วนอื่น (checkout, ติดตั้ง node/pnpm) ปล่อยเหมือนเดิม ---
+      - name: ดึงโค้ดทั้งหมด
+        uses: actions/checkout@v4
 
-      # ✅ ใส่/แก้ตรงนี้ แทนคำสั่ง build เดิมทั้งหมด
-      - name: สร้างแค่ mockup-sandbox เท่านั้น
+      - name: ติดตั้ง Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: ติดตั้ง pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: ติดตั้งแพ็กเกจทั้งหมด
+        run: pnpm install
+
+      # ✅ สร้างหน้าหลัก ใส่ PORT ให้ถูกต้อง
+      - name: สร้าง mockup-sandbox
         run: |
           cd artifacts/mockup-sandbox
           PORT=3000 pnpm build
 
-      - name: อัปโหลดไฟล์ผลลัพธ์
+      # ✅ สร้างแดชบอร์ด ครบทุกฟังก์ชันเหมือนเดิม
+      - name: สร้าง dashboard
+        run: |
+          cd artifacts/dashboard
+          pnpm build
+
+      # ✅ รวมไฟล์ทั้งหมดไม่ให้หาย
+      - name: จัดระเบียบไฟล์
+        run: |
+          mkdir -p ./public
+          cp -r ./artifacts/mockup-sandbox/dist/* ./public/
+          cp -r ./artifacts/dashboard/dist/* ./public/dashboard/
+
+      - name: ตั้งค่า GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: อัปโหลดไฟล์
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './artifacts/mockup-sandbox/dist'
+          path: './public'
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: เผยแพร่
+        id: deployment
+        uses: actions/deploy-pages@v4
