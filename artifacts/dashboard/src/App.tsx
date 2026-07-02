@@ -7,6 +7,7 @@ import { Landing } from "@/pages/landing";
 import { Feed } from "@/pages/feed";
 import { Stats } from "@/pages/stats";
 import { Layout } from "@/components/layout";
+import { WelcomeModal } from "@/components/WelcomeModal";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <WelcomeModal />
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
           <Router />
         </WouterRouter>
