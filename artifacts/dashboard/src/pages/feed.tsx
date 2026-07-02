@@ -9,6 +9,7 @@ import {
 import { formatDistanceToNow, format } from "date-fns";
 import { Activity, Shield, AlertTriangle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { CrisisOverlay } from "@/components/CrisisOverlay";
 
 function truncateId(id: string) {
   return id.substring(0, 8);
@@ -27,6 +28,7 @@ export function Feed() {
   const { data: stats } = useGetEventStats({ query: { queryKey: getGetEventStatsQueryKey(), refetchInterval: 10000 } });
   const [liveEvents, setLiveEvents] = useState<AnonymizedEvent[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [crisisEvent, setCrisisEvent] = useState<AnonymizedEvent | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,6 +47,10 @@ export function Feed() {
     es.onmessage = (e) => {
       const event = JSON.parse(e.data) as AnonymizedEvent;
       setLiveEvents((prev) => [event, ...prev].slice(0, 200));
+      // Only trigger crisis overlay for real-time self_harm events (not historical)
+      if (event.flagged && event.flagCategory === "self_harm") {
+        setCrisisEvent(event);
+      }
     };
 
     return () => es.close();
@@ -178,6 +184,8 @@ export function Feed() {
           )}
         </div>
       </div>
+
+      <CrisisOverlay event={crisisEvent} onDismiss={() => setCrisisEvent(null)} />
     </div>
   );
 }
